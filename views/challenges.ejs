@@ -1,0 +1,271 @@
+<!DOCTYPE html> 
+
+<html> 
+
+<head>
+    <title>EHC Home Page</title> 
+    <link rel="stylesheet" href="public/css/challenges.css"> 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Italianno&family=Playfair+Display&display=swap" rel="stylesheet">
+</head> 
+
+<body> 
+
+    <div class="navbar">
+        <ul>
+            <li id="home-navbar"> <a id="home-link" href="/"> Home </a> </li>
+            <li> <a href="/about"> About </a> </li>
+            <li> <a id="challenges-link" href="/challenges"> Challenges </a> </li>
+            <li> <a  href="/leaderboard"> Leaderboard </a> </li>
+            <li> <a id="logout-link" href="#">Logout</a> </li> 
+           
+        </ul> 
+
+        <h1 id="title-navbar"> EHC's Weekly Challenges </h1>
+
+        <img id="logo" src="public/assets/logo.png"> 
+        <a href="/account" id="account-link"> <img id="account" src="public/assets/account.png"> </a>
+    </div> 
+
+
+  
+    <div class="challenge-description">
+        <img src="public/assets/cross.png" id="cross"> 
+        <p id="title"> Where's my Food? </p>
+        <p id="label"> File Searching </p>
+        <p id="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+             aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure 
+             dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident
+             , sunt in culpa qui officia deserunt mollit anim id est laborum.</p> 
+        
+        <label for="flag" id="flag-label"> Flag (in flag{} form): </label>
+        <input type="text" id="flag-input" name="flag-input">
+        <input id="submit" type="submit" value="Submit!"> 
+
+        <div class="response-container">
+        <p id="response">Correct Answer!</p> 
+        </div>
+
+    </div> 
+
+
+
+    <script>
+
+
+    var challenges = <%- JSON.stringify(data) %>; 
+    let allSolves = challenges.userSolves; 
+    challenges = challenges.allChallenges;  
+    let allChallenges = []; 
+
+    let solvedBefore; 
+    
+   for(let i = 0; i<challenges.length; i++){
+        let newDiv = document.createElement('div'); 
+        let title = document.createElement('p'); 
+        let heading = document.createElement('p'); 
+        let description = document.createElement('p'); 
+        let point = document.createElement('p'); 
+
+        title.innerHTML = challenges[i].title; 
+        heading.innerHTML = challenges[i].label; 
+        description.innerHTML = challenges[i].description; 
+        point.innerHTML = challenges[i].point; 
+
+
+        
+
+        
+        newDiv.insertBefore(title, newDiv.children[0]);
+        newDiv.insertBefore(heading, newDiv.children[1]); 
+
+        
+        //newDiv.insertBefore(description, newDiv.children[2]); 
+      // description.style.opacity = '0%'; 
+
+        point.style.fontSize = '1.2em'; 
+        point.style.fontFamily = 'Times New Roman'; 
+        point.style.marginTop = '10px';
+
+        newDiv.style.position = 'absolute'; 
+        newDiv.style.width = '16.56vw'; 
+        newDiv.style.height = '19.44vw'; 
+        newDiv.style.backgroundColor = '#f5f5f5'; 
+        newDiv.style.borderRadius = '10px'; 
+        newDiv.style.border = 'solid 3px darkred'; 
+        let topMargin = 100 + 330 * (Math.floor(i/5)); 
+        let leftMargin = 50 + 290 * (i%5); 
+        newDiv.style.left = `${leftMargin}px`; 
+        newDiv.style.top = `${topMargin}px`; 
+        newDiv.style.zIndex = '-1'; 
+        newDiv.style.textAlign = 'center'; 
+       
+        
+
+        title.style.color = 'black'; 
+        title.style.fontWeight = 'bold'; 
+        title.style.fontSize = '1.3em'; 
+        title.style.marginTop = '10px'; 
+        title.style.textAlign = 'center'; 
+        title.style.fontFamily = `'Playfair Display', serif`; 
+        
+
+        heading.style.color = 'black'; 
+        heading.style.marginTop = '5px'; 
+        heading.style.textAlign = 'center'; 
+        heading.style.fontSize = '1.1em'; 
+        heading.style.fontFamily = `'Playfair Display', serif`; 
+
+
+        let imgLogo = document.createElement("img"); 
+        imgLogo.src = "public/assets/hacking-logo.png"; 
+        imgLogo.style.position = 'relative'; 
+        imgLogo.style.top = '8px';
+        imgLogo.style.left = '3px';
+        
+     
+
+        newDiv.insertBefore(imgLogo, newDiv.children[3]); 
+
+        newDiv.insertBefore(point, newDiv.children[4]); 
+       
+     
+
+        solvedBefore = false; 
+
+
+        for(let j = 0; j<allSolves.length; j++){
+            if(allSolves[j].challengeID === challenges[i].id){
+                solvedBefore = true; 
+                break; 
+            }
+        }
+
+        if(solvedBefore){
+            let diag = document.createElement('img'); 
+            diag.src = "public/assets/diag.png"; 
+            diag.style.width = '90%';  
+            diag.style.zIndex = '50'; 
+            diag.style.position = 'relative'; 
+            diag.style.bottom = '240px'; 
+            
+            newDiv.insertBefore(diag, newDiv.children[5]); 
+        }
+        else{
+            newDiv.addEventListener('click', function(){
+                showChallenge(challenges[i].id, title.innerHTML, heading.innerHTML, description.innerHTML); 
+            }, false); 
+         }
+
+         document.body.appendChild(newDiv);
+
+
+
+        allChallenges.push(newDiv); 
+   }
+
+
+   let curId; 
+
+   function showChallenge(id, title, heading, description){
+        
+        let descriptionClass = document.getElementsByClassName('challenge-description')[0]; 
+        let challengeTitle = document.getElementById('title'); 
+        let challengeLabel = document.getElementById('label'); 
+        let challengeDescription = document.getElementById('description'); 
+
+        challengeTitle.innerHTML = title; 
+        challengeLabel.innerHTML = heading; 
+        challengeDescription.innerHTML = description; 
+
+        descriptionClass.style.zIndex = '10';  
+        descriptionClass.style.opacity = '100%'; 
+
+        curId = id; 
+    }
+    
+   
+    let cross = document.getElementById('cross'); 
+   
+    cross.addEventListener('click', function(){
+        let descriptionClass = document.getElementsByClassName('challenge-description')[0]; 
+        let responseContainer = document.getElementsByClassName('response-container')[0]; 
+        descriptionClass.style.zIndex = '-5'; 
+        descriptionClass.style.opacity = '0%'; 
+        responseContainer.style.opacity = '0%'; 
+    }, false); 
+
+
+
+    let submitFlag = document.getElementById('submit'); 
+    let flagInput = document.getElementById('flag-input'); 
+
+    submitFlag.addEventListener('click', function(){
+        let flagGuess = flagInput.value.toString(); 
+        let challengeID = curId; 
+        flagInput.value = ""; 
+        let dataToSend = {
+            'flagGuess': flagGuess.trim(),
+            'id': challengeID
+        }; 
+
+        const xhr = new XMLHttpRequest(); 
+        xhr.open('POST', 'http://localhost:5555/challenges'); 
+        xhr.setRequestHeader('Content-Type', 'application/json'); 
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); 
+
+        xhr.send(JSON.stringify(dataToSend));
+
+        xhr.onload = () => {
+            let responseData = JSON.parse(xhr.responseText); 
+
+            let responseContainer = document.getElementsByClassName('response-container')[0]; 
+            let response = document.getElementById('response');
+            
+            if(responseData.status === 1){
+               // responseContainer.style.backgroundColor = 'red';
+                responseContainer.style.backgroundColor = '#070750';  
+                response.style.color = 'red'; 
+                response.style.fontWeight = 'bold'; 
+                response.innerHTML = responseData.message; 
+            }
+            else{
+               // responseContainer.style.backgroundColor = 'green'; 
+               responseContainer.style.backgroundColor = '#070750';  
+                response.style.color = 'rgb(133,249,133)'; 
+                response.innerHTML = responseData.message; 
+                
+                let rightChallenge = allChallenges[responseData.id-1];
+
+                let diag = document.createElement('img'); 
+                diag.src = "public/assets/diag.png"; 
+                diag.style.width = '90%'; 
+                diag.style.zIndex = '50'; 
+                diag.style.position = 'relative'; 
+                diag.style.bottom = '240px'; 
+            
+                rightChallenge.insertBefore(diag, rightChallenge.children[5]);
+
+            }
+            responseContainer.style.opacity = '100%'; 
+            
+        }; 
+    }); 
+
+    // Create new table in db "solves" with userID and challengeID cols, create ui so that each solve only gets registered once
+   
+
+    </script> 
+
+    <script src="public/js/challenges.js"> </script>
+    <script src="public/js/logout.js"></script> 
+
+
+</body>
+
+
+
+
+
+</html>
